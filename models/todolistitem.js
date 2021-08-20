@@ -2,7 +2,9 @@
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class TodolistItem extends Model {
-    static associate(models) {}
+    static associate(models) {
+      this.belongsTo(models.Todolist);
+    }
   }
   TodolistItem.init(
     {
@@ -48,6 +50,8 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "TodolistItem",
+      underscored: true, // to set a snakecase
+      timestamps: false, // to delete duplicate created_at
     }
   );
   return TodolistItem;

@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const { Sequelize, DataTypes } = require("sequelize");
 const Todolist = require("./models/todolist");
+const TodolistItem = require("./models/todolistitem");
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
@@ -11,6 +12,7 @@ const mysqlURI = `mysql://${process.env.MYSQL_USER}:${process.env.MYSQL_PASS}@${
 const sequelize = new Sequelize(mysqlURI);
 
 const TodolistModel = Todolist(sequelize, DataTypes);
+const TodolistItemModel = TodolistItem(sequelize, DataTypes);
 
 app.get("/api/v1/todolist", (req, res) => {
   // this will return a promise - need to do async await
@@ -39,6 +41,41 @@ app.post("/api/v1/todolist", (req, res) => {
 
   console.log(todolist);
   return res.json({});
+});
+
+// how to post 1 todolist-item inside todolist
+app.post("/api/v1/todolist/:todolistID/items", async (req, res) => {
+  //   get the todolist from model
+  let todolist = null;
+  try {
+    todolist = await TodolistModel.findOne({
+      where: {
+        id: req.params.todolistID,
+      },
+    });
+  } catch (err) {
+    res.statusCode = 500;
+    return res.json();
+  }
+
+  //   if not exist, return not found
+  if (!todolist) {
+    res.statusCode = 404;
+    return res.json();
+  }
+
+  //   create the todolist item
+  const item = new TodolistItemModel();
+  item.todolist_id = todolist.id;
+  item.title = req.body.title;
+  if (req.body.description) {
+    item.description = req.body.description;
+  }
+
+  //   persists to db
+  item.save();
+
+  return res.json();
 });
 
 app.listen(port, () => {

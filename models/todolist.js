@@ -3,7 +3,9 @@ const { Model } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
   class Todolist extends Model {
-    static associate(models) {}
+    static associate(models) {
+      this.hasMany(models.TodolistItem);
+    }
   }
 
   Todolist.init(
