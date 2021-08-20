@@ -15,6 +15,7 @@ module.exports = {
           model: "todolists", //entity or table that we want to connect with
           key: "id", // columns that we want to migrate to
         },
+        onDelete: "CASCADE",
       },
       title: {
         type: Sequelize.STRING,
